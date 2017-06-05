@@ -1,0 +1,7 @@
+---
+name: locket
+
+dependencies:
+  - golang1.7
+
+files:

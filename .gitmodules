@@ -16,3 +16,6 @@
 [submodule "src/gopkg.in/yaml.v2"]
 	path = src/gopkg.in/yaml.v2
 	url = https://gopkg.in/yaml.v2
+[submodule "src/locket"]
+	path = src/locket
+	url = https://github.com/cloudfoundry/locket

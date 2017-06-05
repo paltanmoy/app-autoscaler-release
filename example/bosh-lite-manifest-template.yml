@@ -210,7 +210,7 @@ instance_groups:
   - name: metricscollector
     azs:
       - z1
-    instances: 1
+    instances: 2
     networks:
       - name: default
     stemcell: default

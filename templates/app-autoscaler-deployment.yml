@@ -16,6 +16,10 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.162.0
   sha1: f17cf09d2414f5f486d18bbd57b17fd48fb69773
   version: '0.162.0'
+- name: loggregator
+  url: https://bosh.io/d/github.com/cloudfoundry/loggregator-release?v=99
+  version: "99"
+  sha1: 2080e1e0594591dafa716c69f207eb29929bce3d
 
 # Stemcell details
 stemcells:
@@ -304,6 +308,42 @@ instance_groups:
         server_cert: ((metricscollector_server.certificate))
         server_key: ((metricscollector_server.private_key))
 
+# Metric-forwarder Instance Group
+- name: metricsforwarder
+  azs:
+  - z1
+  instances: 1
+  networks:
+  - name: default
+  stemcell: default
+  vm_type: small
+  jobs:
+  - name: consul_agent
+    release: consul
+    consumes:
+      consul_common: {from: consul_common_link, deployment: cf}
+      consul_server: nil
+      consul_client: {from: consul_client_link, deployment: cf}
+  - name: metron_agent
+    release: loggregator
+    properties:
+      loggregator:
+        tls:
+          ca_cert: ((loggregator_tls_metron.ca))
+          metron:
+            cert: ((loggregator_tls_metron.certificate))
+            key: ((loggregator_tls_metron.private_key))
+  - name: metricsforwarder
+    release: app-autoscaler
+    properties:
+      metricsforwarder:
+        log_level: debug
+        server_port: 6110
+        loggregator:
+          ca_cert: ((loggregator_tls_metron.ca))
+          client_cert: ((loggregator_tls_metron.certificate))
+          client_key: ((loggregator_tls_metron.private_key))
+
 # Event-Generator Instance Group
 - name: eventgenerator
   azs:
@@ -485,3 +525,16 @@ variables:
     common_name: scheduler client
     extended_key_usage:
     - client_auth
+- name: loggregator_ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: loggregatorCA
+- name: loggregator_tls_metron
+  type: certificate
+  options:
+    ca: loggregator_ca
+    common_name: metron
+    extended_key_usage:
+    - client_auth
+    - server_auth

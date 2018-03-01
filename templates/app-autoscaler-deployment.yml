@@ -288,6 +288,7 @@ instance_groups:
       lock_db: *database
       cf: &cf_credentials
         api: "https://api.((system_domain))"
+        uaa_api: "https://uaa.((system_domain))"
         grant_type: password
         username: admin
         password: "((cf_admin_password))"
@@ -300,6 +301,7 @@ instance_groups:
         server:
           port: 6103
         collector:
+          collect_method: streaming
           refresh_interval: 60s
           collect_interval: 30s
           save_interval: 5s
@@ -338,11 +340,25 @@ instance_groups:
     properties:
       metricsforwarder:
         log_level: debug
-        server_port: 6110
+        server_port: &metricsForwarderPublicPort 6110
         loggregator:
           ca_cert: ((loggregator_tls_metron.ca))
           client_cert: ((loggregator_tls_metron.certificate))
           client_key: ((loggregator_tls_metron.private_key))
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats: {from: nats, deployment: cf}
+    properties:
+      route_registrar:
+        routes:
+        - name: metrics_forwarder_api
+          registration_interval: 20s
+          port: *metricsForwarderPublicPort
+          tags:
+            component: metricsforwarder
+          uris:
+            - autoscalermetricsforwarder.((system_domain))
 
 # Event-Generator Instance Group
 - name: eventgenerator

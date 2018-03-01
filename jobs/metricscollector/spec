@@ -53,6 +53,8 @@ properties:
 
   cf.api:
     description: "the Cloud Foundry API endpoint"
+  cf.uaa_api:
+    description: "the Cloud Foundry UAA API endpoint"
   cf.grant_type:
     description: "the grant type to log in cf" 
   cf.username:

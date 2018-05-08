@@ -1,0 +1,34 @@
+---
+name: metricsforwarder
+
+templates:
+  metricsforwarder_ctl: bin/metricsforwarder_ctl
+  metricsforwarder.yml.erb: config/metricsforwarder.yml
+  loggregator_ca.crt.erb: config/certs/loggregator/ca.crt
+  loggregator_client.crt.erb: config/certs/loggregator/client.crt
+  loggregator_client.key.erb: config/certs/loggregator/client.key
+
+packages:
+  - metricsforwarder
+  - common
+
+consumes:
+- name: metron_agent
+  type: metron_agent
+
+properties:
+  metricsforwarder.metron_address:
+    description: "IP address and port where the metron agent is running"
+    default: "127.0.0.1:3458"
+  metricsforwarder.log_level:
+    description: "the level of logging"
+    default: "info"
+  metricsforwarder.server_port:
+    description: "the listening port of metricsforwarder server"
+    default: 6110
+  metricsforwarder.loggregator.ca_cert:
+    description: "Path to the file containing loggregator CA cert"
+  metricsforwarder.loggregator.client_cert:
+    description: "Path to the file containing loggregator cert"
+  metricsforwarder.loggregator.client_key:
+    description: "Path to the file containing loggregator key"

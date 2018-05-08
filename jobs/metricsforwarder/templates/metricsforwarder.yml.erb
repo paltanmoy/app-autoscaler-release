@@ -1,0 +1,7 @@
+log_level: <%= p("metricsforwarder.log_level") %>
+metron_address: <%= p("metricsforwarder.metron_address") %>
+server_port: <%= p("metricsforwarder.server_port") %>
+loggregator:
+  ca_cert: /var/vcap/jobs/metricsforwarder/config/certs/loggregator/ca.crt
+  client_cert: /var/vcap/jobs/metricsforwarder/config/certs/loggregator/client.crt
+  client_key: /var/vcap/jobs/metricsforwarder/config/certs/loggregator/client.key

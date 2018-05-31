@@ -234,6 +234,7 @@ instance_groups:
         password: password
         http_request_timeout: 5000
         dashboard_redirect_uri: ""
+        custom_metrtics_url: "https://autoscalermetricsforwarder.((system_domain))/v1/metrics"
         catalog: 
           services:
           - id: autoscaler-guid
@@ -613,6 +614,8 @@ instance_groups:
   - name: metricsforwarder
     release: app-autoscaler
     properties:
+      policy_db: *database
+      policy_db_connection_config: *databaseConnectionConfig
       metricsforwarder:
         log_level: debug
         server_port: &metricsForwarderPublicPort 6110

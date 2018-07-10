@@ -5,20 +5,26 @@ dependencies:
   - golang1.7
 
 files:
+- app-autoscaler/src/autoscaler/cf/*.go # gosub
 - app-autoscaler/src/autoscaler/db/*.go # gosub
 - app-autoscaler/src/autoscaler/db/sqldb/*.go # gosub
 - app-autoscaler/src/autoscaler/helpers/*.go # gosub
 - app-autoscaler/src/autoscaler/metricsforwarder/cmd/metricsforwarder/*.go # gosub
 - app-autoscaler/src/autoscaler/metricsforwarder/config/*.go # gosub
+- app-autoscaler/src/autoscaler/metricsforwarder/fakes/*.go # gosub
 - app-autoscaler/src/autoscaler/metricsforwarder/forwarder/*.go # gosub
 - app-autoscaler/src/autoscaler/metricsforwarder/server/*.go # gosub
 - app-autoscaler/src/autoscaler/models/*.go # gosub
 - app-autoscaler/src/autoscaler/routes/*.go # gosub
+- app-autoscaler/src/code.cloudfoundry.org/cfhttp/*.go # gosub
 - app-autoscaler/src/code.cloudfoundry.org/cfhttp/handlers/*.go # gosub
+- app-autoscaler/src/code.cloudfoundry.org/cfhttp/unix_transport/*.go # gosub
+- app-autoscaler/src/code.cloudfoundry.org/clock/*.go # gosub
 - app-autoscaler/src/code.cloudfoundry.org/go-diodes/*.go # gosub
 - app-autoscaler/src/code.cloudfoundry.org/go-loggregator/*.go # gosub
 - app-autoscaler/src/code.cloudfoundry.org/go-loggregator/rpc/loggregator_v2/*.go # gosub
 - app-autoscaler/src/code.cloudfoundry.org/lager/*.go # gosub
+- app-autoscaler/src/github.com/cloudfoundry-incubator/uaago/*.go # gosub
 - app-autoscaler/src/github.com/golang/protobuf/proto/*.go # gosub
 - app-autoscaler/src/github.com/golang/protobuf/ptypes/*.go # gosub
 - app-autoscaler/src/github.com/golang/protobuf/ptypes/any/*.go # gosub

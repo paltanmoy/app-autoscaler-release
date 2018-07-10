@@ -14,8 +14,8 @@ packages:
   - db
 
 consumes:
-- name: metron_agent
-  type: metron_agent
+- name: loggregator_agent
+  type: loggregator_agent
 
 properties:
   policy_db.address:
@@ -40,11 +40,11 @@ properties:
   metricsforwarder.metron_address:
     description: "IP address and port where the metron agent is running"
     default: "127.0.0.1:3458"
-  metricsforwarder.log_level:
+  metricsforwarder.logging.level:
     description: "the level of logging"
     default: "info"
-  metricsforwarder.server_port:
-    description: "the listening port of metricsforwarder server"
+  metricsforwarder.server.port:
+    description: "the listening port of server"
     default: 6110
   metricsforwarder.loggregator.ca_cert:
     description: "Path to the file containing loggregator CA cert"

@@ -17,9 +17,11 @@ db:
     max_open_connections: <%= p("policy_db_connection_config.max_open_connections") %>
     max_idle_connections: <%= p("policy_db_connection_config.max_idle_connections") %>
     connection_max_lifetime: <%= p("policy_db_connection_config.connection_max_lifetime") %>
-log_level: <%= p("metricsforwarder.log_level") %>
+logging:
+  level: <%= p("metricsforwarder.logging.level") %>
 metron_address: <%= p("metricsforwarder.metron_address") %>
-server_port: <%= p("metricsforwarder.server_port") %>
+server:
+  port: <%= p("metricsforwarder.server.port") %>
 loggregator:
   ca_cert: /var/vcap/jobs/metricsforwarder/config/certs/loggregator/ca.crt
   client_cert: /var/vcap/jobs/metricsforwarder/config/certs/loggregator/client.crt

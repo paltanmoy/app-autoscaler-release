@@ -16,10 +16,10 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.162.0
   sha1: f17cf09d2414f5f486d18bbd57b17fd48fb69773
   version: '0.162.0'
-- name: loggregator
-  url: https://bosh.io/d/github.com/cloudfoundry/loggregator-release?v=99
-  version: "99"
-  sha1: 2080e1e0594591dafa716c69f207eb29929bce3d
+- name: "loggregator-agent"
+  version: "1.0"
+  url: "https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=1.0"
+  sha1: "aa70e3bc95e25fe86ab00f3b698216a24a44c9d5"
 
 # Stemcell details
 stemcells:
@@ -602,27 +602,29 @@ instance_groups:
       consul_common: {from: consul_common_link, deployment: cf}
       consul_server: nil
       consul_client: {from: consul_client_link, deployment: cf}
-  - name: metron_agent
-    release: loggregator
+  - name: loggregator_agent
+    release: loggregator-agent
     properties:
       loggregator:
         tls:
-          ca_cert: ((loggregator_tls_metron.ca))
-          metron:
-            cert: ((loggregator_tls_metron.certificate))
-            key: ((loggregator_tls_metron.private_key))
+          ca_cert: ((loggregator_ca.certificate))
+          agent:
+            cert: ((loggregator_tls_agent.certificate))
+            key: ((loggregator_tls_agent.private_key))
   - name: metricsforwarder
     release: app-autoscaler
     properties:
       policy_db: *database
       policy_db_connection_config: *databaseConnectionConfig
       metricsforwarder:
-        log_level: debug
-        server_port: &metricsForwarderPublicPort 6110
+        logging:
+          level: info
+        server:
+          port: &metricsForwarderPublicPort 6110
         loggregator:
-          ca_cert: ((loggregator_tls_metron.ca))
-          client_cert: ((loggregator_tls_metron.certificate))
-          client_key: ((loggregator_tls_metron.private_key))
+          ca_cert: ((loggregator_ca.certificate))
+          client_cert: ((loggregator_tls_agent.certificate))
+          client_key: ((loggregator_tls_agent.private_key))
   - name: route_registrar
     release: routing
     consumes:

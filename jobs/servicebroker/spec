@@ -97,5 +97,8 @@ properties:
   autoscaler.service_broker.dashboard_redirect_uri:
     description: "service dashboard redirect uri"
     default: ""
+  autoscaler.service_broker.custom_metrtics_url:
+    description: "custom metrics uri"
+    default: ""
 
   

@@ -16,6 +16,10 @@ releases:
   url: https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.162.0
   sha1: f17cf09d2414f5f486d18bbd57b17fd48fb69773
   version: '0.162.0'
+- name: "loggregator-agent"
+  version: "1.0"
+  url: "https://bosh.io/d/github.com/cloudfoundry/loggregator-agent-release?v=1.0"
+  sha1: "aa70e3bc95e25fe86ab00f3b698216a24a44c9d5"
 
 # Stemcell details
 stemcells:
@@ -233,6 +237,7 @@ instance_groups:
           password: password
           http_request_timeout: 5000
           dashboard_redirect_uri: ""
+          custom_metrtics_url: "https://autoscalermetricsforwarder.((system_domain))/v1/metrics"
           catalog: 
             services:
             - id: autoscaler-guid
@@ -339,11 +344,12 @@ instance_groups:
         policy_db_connection_config: *databaseConnectionConfig
         cf: &cf_credentials
           api: "https://api.((system_domain))"
+          uaa_api: "https://uaa.((system_domain))"
           grant_type: password
           username: admin
           password: "((cf_admin_password))"
-          client_id: ""
-          secret: ""
+          client_id: "((autoscaler_client_id))"
+          secret: "((autoscaler_client_secret))"
           skip_ssl_validation: "((skip_ssl_validation))"
         metricscollector:
           logging:
@@ -354,9 +360,64 @@ instance_groups:
             refresh_interval: 60s
             collect_interval: 30s
             save_interval: 5s
+            collect_method: streaming
           ca_cert: ((metricscollector_ca.ca))
           server_cert: ((metricscollector_server.certificate))
           server_key: ((metricscollector_server.private_key))
+
+# Metric-forwarder Instance Group
+- name: metricsforwarder
+  azs:
+  - z1
+  instances: 1
+  networks:
+  - name: default
+  stemcell: default
+  vm_type: small
+  jobs:
+  - name: consul_agent
+    release: consul
+    consumes:
+      consul_common: {from: consul_common_link, deployment: cf}
+      consul_server: nil
+      consul_client: {from: consul_client_link, deployment: cf}
+  - name: loggregator_agent
+    release: loggregator-agent
+    properties:
+      loggregator:
+        tls:
+          ca_cert: ((loggregator_ca.certificate))
+          agent:
+            cert: ((loggregator_tls_agent.certificate))
+            key: ((loggregator_tls_agent.private_key))
+  - name: metricsforwarder
+    release: app-autoscaler
+    properties:
+      policy_db: *database
+      policy_db_connection_config: *databaseConnectionConfig
+      metricsforwarder:
+        logging:
+          level: info
+        server:
+          port: &metricsForwarderPublicPort 6110
+        loggregator:
+          ca_cert: ((loggregator_ca.certificate))
+          client_cert: ((loggregator_tls_agent.certificate))
+          client_key: ((loggregator_tls_agent.private_key))
+  - name: route_registrar
+    release: routing
+    consumes:
+      nats: {from: nats, deployment: cf}
+    properties:
+      route_registrar:
+        routes:
+        - name: metrics_forwarder_api
+          registration_interval: 20s
+          port: *metricsForwarderPublicPort
+          tags:
+            component: metricsforwarder
+          uris:
+            - autoscalermetricsforwarder.((system_domain))
 
 # Event-Generator Instance Group
 - name: eventgenerator
@@ -418,7 +479,7 @@ instance_groups:
             consecutive_failure_count: 5
           scaling_engine:
             host: scalingengine.service.cf.internal
-            port: *scalingEnginePort
+            port: &scalingEnginePort 6104
             ca_cert: ((scalingengine_ca.ca))
             client_cert: ((scalingengine_client.certificate))
             client_key: ((scalingengine_client.private_key))
@@ -471,7 +532,7 @@ instance_groups:
           logging:
             level: debug
           server:
-            port: &scalingEnginePort 6104
+            port: *scalingEnginePort
           health:
             port: &scalingEngineHealthPort 6204
             emit_interval: 15s
